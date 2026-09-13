@@ -27,3 +27,17 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+
+class Education(models.Model):
+    institution = models.CharField(max_length=255)
+    thumbnail = models.URLField(blank=True, null=True)
+    start_year = models.PositiveIntegerField()
+    end_year = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.institution
+
+    @property
+    def is_ongoing(self):
+        return self.end_year is None

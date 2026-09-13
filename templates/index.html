@@ -16,6 +16,7 @@
             <nav>
                 <a href="{% url 'main:show_main' %}">Profile</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
             </nav>
         </div>
     </header>
@@ -48,35 +49,6 @@
                         <a href="mailto:devadattadarmaputra@gmail.com" class="social-link social-link-primary">Email Me</a>
                         <a href="https://github.com/depadangkall" class="social-link">GitHub</a>
                         <a href="https://www.linkedin.com/in/igededevadatta" class="social-link">LinkedIn</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="education" id="education">
-            <div class="container">
-                <h2 class="section-title">Education</h2>
-                <p class="section-subtitle"></p>
-
-                <div class="grid-list">
-                    <div class="grid-card">
-                        <div class="grid-card-photo">
-                            <img src="/static/img/logo-UI.png" alt="Universitas Indonesia campus" class="grid-card-img">
-                        </div>
-                        <div class="card-text">
-                            <span class="card-label">2025 - Present</span>
-                            <h3>Universitas Indonesia</h3>
-                        </div>
-                    </div>
-
-                    <div class="grid-card">
-                        <div class="grid-card-photo">
-                            <img src="/static/img/Logo_SMAN_2_Bogor.png" alt="SMAN 2 Bogor school grounds" class="grid-card-img">
-                        </div>
-                        <div class="card-text">
-                            <span class="card-label">2022 - 2025</span>
-                            <h3>SMAN 2 BOGOR</h3>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -144,7 +116,7 @@
 
     <footer class="site-footer">
         <div class="container footer-grid">
-            <p class="footer-copy">&copy; 2026 {{name}}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+            <p class="footer-copy">&copy; 2026 {{name}}. Faculty of Computer Science, Universitas Indonesia.</p>
             <a href="#profile" class="back-to-top">Back to top &uarr;</a>
         </div>
     </footer>
