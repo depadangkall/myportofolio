@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moments - {{ name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
+                <a href="{% url 'main:show_moments' %}">Moments</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="moments-section" id="moments">
+            <div class="container">
+                <p class="section-kicker">Snapshots along the way</p>
+                <h1>Moments</h1>
+
+                {% if moment_list %}
+                    <div class="moments-canvas">
+                        <div class="moments-track-wrap">
+                            <div class="moments-track">
+                                {% for moment in moment_list %}
+                                    <figure class="moments-item">
+                                        <div class="moments-item-photo">
+                                            <img src="{{ moment.image }}" alt="{{ moment.caption }}">
+                                        </div>
+                                        {% if moment.caption %}
+                                            <figcaption>{{ moment.caption }}</figcaption>
+                                        {% endif %}
+                                    </figure>
+                                {% endfor %}
+
+                                {% for moment in moment_list %}
+                                    <figure class="moments-item" aria-hidden="true">
+                                        <div class="moments-item-photo">
+                                            <img src="{{ moment.image }}" alt="">
+                                        </div>
+                                        {% if moment.caption %}
+                                            <figcaption>{{ moment.caption }}</figcaption>
+                                        {% endif %}
+                                    </figure>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="empty-state">No moments have been added yet.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <p class="footer-copy">&copy; 2026 {{name}}. Faculty of Computer Science, Universitas Indonesia.</p>
+            <a href="#profile" class="back-to-top">Back to top &uarr;</a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var canvas = document.querySelector(".moments-canvas");
+            if (!canvas) {
+                return;
+            }
+
+            var items = canvas.querySelectorAll(".moments-item");
+            items.forEach(function (item, index) {
+                item.style.transitionDelay = ((index % 6) * 0.08) + "s";
+            });
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("in-view");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            observer.observe(canvas);
+        });
+    </script>
+</body>
+</html>

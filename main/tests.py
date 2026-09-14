@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Education, Experience
+from main.models import Education, Experience, Moment
 
 
 class MainTest(TestCase):
@@ -15,6 +15,10 @@ class MainTest(TestCase):
         self.education = Education.objects.create(
             institution="Universitas Indonesia",
             start_year=2025,
+        )
+        self.moment = Moment.objects.create(
+            image="/static/img/foto-baru.png",
+            caption="Welcoming staff",
         )
 
     def test_main_url_is_accessible(self):
@@ -87,3 +91,20 @@ class MainTest(TestCase):
         self.assertFalse(self.education.is_ongoing)
         self.assertContains(response, "2029")
         self.assertNotContains(response, "Present")
+
+    def test_moments_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_moments"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "moments.html")
+
+    def test_moments_page(self):
+        response = self.client.get(reverse("main:show_moments"))
+
+        self.assertContains(response, self.moment.image)
+
+    def test_empty_moments_page(self):
+        Moment.objects.all().delete()
+        response = self.client.get(reverse("main:show_moments"))
+
+        self.assertContains(response, "No moments have been added yet.")

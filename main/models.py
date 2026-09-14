@@ -18,7 +18,7 @@ class Experience(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     category = models.CharField(max_length=20, choices=EXPERIENCE_CHOICES, default='full-time')
-    thumbnail = models.URLField(blank=True, null=True)
+    thumbnail = models.CharField(max_length=500, blank=True, null=True)
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(blank=True, null=True)
     def __str__(self):
@@ -31,7 +31,7 @@ class Experience(models.Model):
 
 class Education(models.Model):
     institution = models.CharField(max_length=255)
-    thumbnail = models.URLField(blank=True, null=True)
+    thumbnail = models.CharField(max_length=500, blank=True, null = True)
     start_year = models.PositiveIntegerField()
     end_year = models.PositiveIntegerField(blank=True, null=True)
 
@@ -41,3 +41,11 @@ class Education(models.Model):
     @property
     def is_ongoing(self):
         return self.end_year is None
+
+
+class Moment(models.Model):
+    image = models.CharField(max_length=500)
+    caption = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.caption or self.image

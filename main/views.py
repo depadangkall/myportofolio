@@ -1,11 +1,12 @@
 from django.shortcuts import render
 
-from main.models import Education, Experience
+from main.models import Education, Experience, Moment
 
 
 def show_main(request):
     context = {
         "name": "I Gede Devadatta",
+        "short_name": "Deva",
         "npm": "2506622481",
         "study_program": "Information Systems",
         "bio": (
@@ -27,6 +28,14 @@ def show_experience(request):
 def show_education(request):
     context = {
         "name": "Deva",
-        "education_list": Education.objects.all().order_by("-start_year"),
+        "education_list": Education.objects.all().order_by("start_year"),
     }
     return render(request, "education.html", context)
+
+
+def show_moments(request):
+    context = {
+        "name": "Deva",
+        "moment_list": Moment.objects.all(),
+    }
+    return render(request, "moments.html", context)

@@ -17,6 +17,7 @@
                 <a href="{% url 'main:show_main' %}">Profile</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
                 <a href="{% url 'main:show_education' %}">Education</a>
+                <a href="{% url 'main:show_moments' %}">Moments</a>
             </nav>
         </div>
     </header>
@@ -35,19 +36,24 @@
                                     <img src="{{ experience.thumbnail }}" alt="{{ experience.title }}" class="card-img">
                                 </div>
                             {% endif %}
-                            <span class="experience-category">
-                                {{ experience.get_category_display }}
-                            </span>
-                            <h2>{{ experience.title }}</h2>
-                            <p class="experience-description">
-                                {{ experience.description }}
-                            </p>
+                            <div class="card-text">
+                                <span class="experience-category">
+                                    {{ experience.get_category_display }}
+                                </span>
+                                <h2>{{ experience.title }}</h2>
+                                <details>
+                                    <summary>See details</summary>
+                                    <p class="experience-description">
+                                        {{ experience.description }}
+                                    </p>
+                                </details>
 
-                            {% if experience.is_ongoing %}
-                                <p class="experience-status">Ongoing</p>
-                            {% else %}
-                                <p class="experience-status">Finished</p>
-                            {% endif %}
+                                {% if experience.is_ongoing %}
+                                    <p class="experience-status status-ongoing">Ongoing</p>
+                                {% else %}
+                                    <p class="experience-status status-finished">Finished</p>
+                                {% endif %}
+                            </div>
                         </article>
                     {% empty %}
                         <p class="empty-state">
@@ -65,5 +71,28 @@
             <a href="#profile" class="back-to-top">Back to top &uarr;</a>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var cards = document.querySelectorAll(".experience-card");
+            if (!cards.length) {
+                return;
+            }
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("in-view");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            cards.forEach(function (card, index) {
+                card.style.transitionDelay = (index * 0.08) + "s";
+                observer.observe(card);
+            });
+        });
+    </script>
 </body>
 </html>
