@@ -1,0 +1,140 @@
+[
+{
+  "model": "main.experience",
+  "pk": "0756fb5a-edff-4b8d-a699-430f68a0eb5d",
+  "fields": {
+    "title": "Dasar - Dasar Pemrograman 0 (DDP0)",
+    "description": "As Business Development staff, I handled merchandise production and managed the entire sales process from planning to distribution. As a mentor, I taught the basics of Python programming to my group of beginner students.",
+    "category": "volunteer",
+    "thumbnail": "/static/img/dedepe0.jpg",
+    "started_at": "2026-09-09T06:32:32.844Z",
+    "ended_at": null
+  }
+},
+{
+  "model": "main.experience",
+  "pk": "1918f6c2-0ff0-4545-85bf-cadaccece3dc",
+  "fields": {
+    "title": "Mentor Welmab KMHD UI 2026",
+    "description": "Mentor at KMHD UI guiding new students through their first steps into university life, from academics to building connections on campus",
+    "category": "full-time",
+    "thumbnail": "/static/img/kmhdui-logo.jpg",
+    "started_at": "2026-09-09T07:58:25.876Z",
+    "ended_at": null
+  }
+},
+{
+  "model": "main.experience",
+  "pk": "c2757aa2-2e14-4b52-baab-60f006129e4a",
+  "fields": {
+    "title": "COMPFEST",
+    "description": "I create marketing campaigns to promote COMPFEST's series of events and produce social media content to help build awareness and engagement around them.",
+    "category": "volunteer",
+    "thumbnail": "/static/img/kompes.jpg",
+    "started_at": "2026-09-09T06:32:32.859Z",
+    "ended_at": null
+  }
+},
+{
+  "model": "main.experience",
+  "pk": "e2ca97ef-def5-4f6e-ad85-ddacdc420b34",
+  "fields": {
+    "title": "OPEN HOUSE FASILKOM UI 2025",
+    "description": "Helped plan and run the on-ground event operations for FASILKOM UI's Open House, coordinating logistics and the event rundown to keep everything on schedule for visitors and participants.",
+    "category": "full-time",
+    "thumbnail": "/static/img/ohfasilkom_logo.jpg",
+    "started_at": "2026-09-09T06:32:32.935Z",
+    "ended_at": "2025-11-30T00:00:00Z"
+  }
+},
+{
+  "model": "main.experience",
+  "pk": "ef53ce37-3ebc-457a-b3fb-0273611792ad",
+  "fields": {
+    "title": "BEM FASILKOM UI",
+    "description": "Currently handling Road To OIM (RTO), serving as a facilitator for FASILKOM's contingent as they prepare for and compete in OIM.",
+    "category": "full-time",
+    "thumbnail": "/static/img/bempacil.jpg",
+    "started_at": "2026-09-09T06:32:32.830Z",
+    "ended_at": null
+  }
+},
+{
+  "model": "main.education",
+  "pk": 1,
+  "fields": {
+    "institution": "Universitas Indonesia",
+    "thumbnail": "/static/img/logo-UI.png",
+    "start_year": 2025,
+    "end_year": null
+  }
+},
+{
+  "model": "main.education",
+  "pk": 2,
+  "fields": {
+    "institution": "SMAN 2 BOGOR",
+    "thumbnail": "/static/img/Logo_SMAN_2_Bogor.png",
+    "start_year": 2022,
+    "end_year": 2025
+  }
+},
+{
+  "model": "main.education",
+  "pk": 3,
+  "fields": {
+    "institution": "SMPN 5 Bogor",
+    "thumbnail": "/static/img/spenli-logo.jpeg",
+    "start_year": 2019,
+    "end_year": 2022
+  }
+},
+{
+  "model": "main.moment",
+  "pk": 1,
+  "fields": {
+    "image": "/static/img/welcomingstaffoh.jpeg",
+    "caption": ""
+  }
+},
+{
+  "model": "main.moment",
+  "pk": 2,
+  "fields": {
+    "image": "/static/img/paradeui.jpeg",
+    "caption": ""
+  }
+},
+{
+  "model": "main.moment",
+  "pk": 3,
+  "fields": {
+    "image": "/static/img/keilmuan.jpeg",
+    "caption": ""
+  }
+},
+{
+  "model": "main.moment",
+  "pk": 4,
+  "fields": {
+    "image": "/static/img/bingkai.jpeg",
+    "caption": ""
+  }
+},
+{
+  "model": "main.moment",
+  "pk": 5,
+  "fields": {
+    "image": "/static/img/bisdevddp0.png",
+    "caption": ""
+  }
+},
+{
+  "model": "main.moment",
+  "pk": 6,
+  "fields": {
+    "image": "/static/img/kmhduwiwipb.png",
+    "caption": ""
+  }
+}
+]
