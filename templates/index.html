@@ -1,27 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ name }} - Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <a href="{% url 'main:show_main' %}" class="brand">{{ short_name }}</a>
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-                <a href="{% url 'main:show_education' %}">Education</a>
-                <a href="{% url 'main:show_moments' %}">Moments</a>
-            </nav>
-        </div>
-    </header>
-
+{% extends "base.html" %}
+{% block meta %}
+    <title>{{ full_name }} - Portfolio</title>
+{% endblock meta %}
+{% block content %}
     <main>
         <section class="hero" id="profile">
             <div class="container hero-grid">
@@ -29,12 +10,12 @@
                     <p class="hero-kicker reveal reveal-1">
                         Information System &middot; Universitas Indonesia
                     </p>
-                    <h1 class="reveal reveal-2">{{ name }}</h1>
+                    <h1 class="reveal reveal-2">{{ full_name }}</h1>
                     <div class="accent-bar reveal reveal-3"></div>
                 </div>
                 <div class="hero-photo reveal reveal-2" id="hero-photo">
                     <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/foto-baru2.jpeg" alt="Photo of {{name}} ">
+                    <img class="avatar" src="/static/img/foto-baru2.jpeg" alt="Photo of {{ full_name }}">
                 </div>
                 <div class="hero-details">
                     <p class="bio reveal reveal-3">{{ bio }}</p>
@@ -67,13 +48,6 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <p class="footer-copy">&copy; 2026 {{short_name}}. Faculty of Computer Science, Universitas Indonesia.</p>
-            <a href="#profile" class="back-to-top">Back to top &uarr;</a>
-        </div>
-    </footer>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var photo = document.getElementById("hero-photo");
@@ -91,5 +65,4 @@
             }
         });
     </script>
-</body>
-</html>
+{% endblock content %}

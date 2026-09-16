@@ -1,27 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% block meta %}
     <title>Moments - {{ name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-                <a href="{% url 'main:show_education' %}">Education</a>
-                <a href="{% url 'main:show_moments' %}">Moments</a>
-            </nav>
-        </div>
-    </header>
-
+{% endblock meta %}
+{% block content %}
     <main>
         <section class="moments-section" id="moments">
             <div class="container">
@@ -63,13 +44,6 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <p class="footer-copy">&copy; 2026 {{name}}. Faculty of Computer Science, Universitas Indonesia.</p>
-            <a href="#profile" class="back-to-top">Back to top &uarr;</a>
-        </div>
-    </footer>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var canvas = document.querySelector(".moments-canvas");
@@ -94,5 +68,4 @@
             observer.observe(canvas);
         });
     </script>
-</body>
-</html>
+{% endblock content %}
