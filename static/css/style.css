@@ -860,6 +860,12 @@ h1, .brand {
     transform: translateY(-4px);
 }
 
+.timeline-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
 @media (max-width: 700px) {
     .timeline-track {
         top: 0;
@@ -918,6 +924,31 @@ h1, .brand {
 
 .button-danger {
     background: #b42318;
+}
+
+.button-sm {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+}
+
+.messages {
+    margin-top: 1rem;
+}
+
+.message {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 700;
+}
+
+.message-success {
+    background: #dcf5e3;
+    color: #1a7f3c;
+}
+
+.message-error {
+    background: #fbe1de;
+    color: #b42318;
 }
 
 .experience-header {
@@ -1012,6 +1043,23 @@ h1, .brand {
     vertical-align: middle;
 }
 
+.inline-delete-form__key {
+    width: 9rem;
+    box-sizing: border-box;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: 0.85rem;
+    background: #fff;
+    color: var(--ink);
+}
+
+.inline-delete-form__key:focus {
+    outline: 2px solid var(--accent);
+    border-color: var(--accent);
+}
+
 .experience-delete-modal {
     display: none;
     position: fixed;
@@ -1076,7 +1124,9 @@ h1, .brand {
 
 .experience-delete-modal__actions {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 0.75rem;
     margin-top: 1.5rem;
 }
@@ -1105,8 +1155,8 @@ h1, .brand {
         flex-direction: column-reverse;
     }
 
-    .experience-delete-modal__actions .button {
+    .experience-delete-modal__actions .button,
+    .experience-delete-modal__actions .inline-delete-form__key {
         width: 100%;
-        text-align: center;
     }
 }

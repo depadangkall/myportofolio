@@ -1,6 +1,6 @@
-from django.forms import ModelForm, Select, Textarea, TextInput
+from django.forms import ModelForm, NumberInput, Select, Textarea, TextInput
 
-from main.models import Experience
+from main.models import Education, Experience
 
 
 class ExperienceForm(ModelForm):
@@ -39,6 +39,48 @@ class ExperienceForm(ModelForm):
             "thumbnail": TextInput(
                 attrs={
                     "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
+                },
+            ),
+        }
+
+
+class EducationForm(ModelForm):
+    class Meta:
+        model = Education
+        fields = [
+            "institution",
+            "thumbnail",
+            "start_year",
+            "end_year",
+        ]
+
+        labels = {
+            "institution": "Institution",
+            "thumbnail": "Thumbnail URL",
+            "start_year": "Start Year",
+            "end_year": "End Year",
+        }
+
+        widgets = {
+            "institution": TextInput(
+                attrs={
+                    "placeholder": "Universitas Indonesia",
+                    "maxlength": 255,
+                },
+            ),
+            "thumbnail": TextInput(
+                attrs={
+                    "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
+                },
+            ),
+            "start_year": NumberInput(
+                attrs={
+                    "placeholder": "2022",
+                },
+            ),
+            "end_year": NumberInput(
+                attrs={
+                    "placeholder": "2026",
                 },
             ),
         }

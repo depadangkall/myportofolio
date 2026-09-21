@@ -1,43 +1,43 @@
 <button type="button"
         class="button button-danger button-sm"
-        popovertarget="delete-experience-{{ experience.id }}"
-        aria-label="Delete {{ experience.title }}"
-        title="Delete experience">
+        popovertarget="delete-education-{{ education.id }}"
+        aria-label="Delete {{ education.institution }}"
+        title="Delete education">
     Delete
 </button>
-<div id="delete-experience-{{ experience.id }}"
+<div id="delete-education-{{ education.id }}"
      class="experience-delete-modal"
      popover="auto"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="delete-experience-title-{{ experience.id }}">
+     aria-labelledby="delete-education-title-{{ education.id }}">
     <button type="button"
             class="experience-delete-modal__backdrop"
-            popovertarget="delete-experience-{{ experience.id }}"
+            popovertarget="delete-education-{{ education.id }}"
             popovertargetaction="hide"
             aria-label="Close delete confirmation"></button>
     <div class="experience-delete-modal__content">
         <button type="button"
                 class="experience-delete-modal__close"
-                popovertarget="delete-experience-{{ experience.id }}"
+                popovertarget="delete-education-{{ education.id }}"
                 popovertargetaction="hide"
                 aria-label="Close delete confirmation">×</button>
-        <h2 id="delete-experience-title-{{ experience.id }}">Delete Experience?</h2>
+        <h2 id="delete-education-title-{{ education.id }}">Delete Education?</h2>
         <p>
             Are you sure you want to delete
-            <strong>{{ experience.title }}</strong>?
+            <strong>{{ education.institution }}</strong>?
         </p>
-        <form method="post" action="{% url 'main:delete_experience' experience.id %}">
+        <form method="post" action="{% url 'main:delete_education' education.id %}">
             {% csrf_token %}
             <div class="experience-delete-modal__actions">
                 <button type="button"
                         class="button button-secondary"
-                        popovertarget="delete-experience-{{ experience.id }}"
+                        popovertarget="delete-education-{{ education.id }}"
                         popovertargetaction="hide">Cancel</button>
                 <input type="password"
                        name="security_key"
                        placeholder="Security Key"
-                       aria-label="Security Key for deleting {{ experience.title }}"
+                       aria-label="Security Key for deleting {{ education.institution }}"
                        class="inline-delete-form__key"
                        required>
                 <button type="submit" class="button button-danger">Yes, Delete</button>

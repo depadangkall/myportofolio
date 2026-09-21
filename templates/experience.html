@@ -50,7 +50,10 @@
                                     <p class="experience-status status-finished">Finished</p>
                                 {% endif %}
 
-                                {% include "components/experience_delete_modal.html" with experience=experience %}
+                                <div class="timeline-actions">
+                                    <a href="{% url 'main:update_experience' experience.id %}" class="button button-secondary button-sm">Edit</a>
+                                    {% include "components/experience_delete_modal.html" with experience=experience %}
+                                </div>
                             </div>
                         </article>
                     {% empty %}

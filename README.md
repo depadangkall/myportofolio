@@ -23,3 +23,13 @@ Kelas : PBP A
 ### AI Disclosure
 
 Saya menggunakan bantuan Claude (Claude Code) untuk beberapa hal di tugas ini, seperti minta saran styling CSS untuk halaman Education dan bantuan debug pas field `thumbnail` gagal disave lewat Django admin.
+
+### Tugas 3
+1. Saya pakai `ModelForm` karena fieldnya otomatis kebuat dari model, jadi saya gak perlu nulis satu satu tag `<input>` dan validasinya juga ikut model, gak perlu dicek manual lagi. Kalau field di model berubah, formnya otomatis nyesuain. `{% csrf_token %}` wajib ada biar form saya gak bisa disalahgunain website lain buat ngirim request atas nama saya diam diam token ini yang jadi bukti kalau request-nya beneran dari form saya sendiri.
+
+2. JSON lebih ringkas dari XML karena gak perlu closing tag di tiap elemen, jadi lebih kecil dan lebih cepat diproses. Formatnya juga udah mirip struktur object/array JavaScript, jadi gampang langsung dipakai di frontend tanpa parsing ribet, dan hampir semua bahasa pemrograman udah support baca/tulis JSON.
+
+3. Waktu ada request ke `/api/education/`, viewnya ambil data dari database (`Education.objects.all()`), hasilnya berupa objek Python, bukan teks. Karena HTTP cuma bisa kirim teks, saya perlu ubah dulu objek itu jadi string JSON lewat `serializers.serialize` (serialization) sebelum dikirim sebagai response. Buat nampilin lagi di halaman Django, saya baca balik JSON-nya pakai `serializers.deserialize` biar jadi objek Python lagi yang bisa dipakai di template.
+
+### AI Disclosure
+Saya minta bantuan Claude Code dalam merancang fitur Create, Update, Delete, dan JSON data delivery untuk bagian Education, mulai dari struktur `EducationForm` di `forms.py`, alur fungsi-fungsi view di `views.py`, routing di `urls.py`, sampai template form dan modal delete-nya, dengan mengikuti pola yang sudah ada di bagian Experience. Selain itu saya juga minta saran soal tampilan, seperti ukuran tombol Edit/Delete di halaman Education biar gak kebesaran. Setelah itu saya cek ulang hasilnya dengan jalanin `python manage.py check` dan `runserver`, buka tiap halaman (list, form create, form update, tombol delete) satu-satu, serta cek endpoint `/api/education/` buat mastiin datanya beneran muncul dalam format JSON dan gak ada error.
