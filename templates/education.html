@@ -41,10 +41,12 @@
                                             </span>
                                             <h3>{{ education.institution }}</h3>
                                         </div>
-                                        {% if user.is_superuser %}
+                                        {% if perms.main.change_education %}
                                             <div class="timeline-actions">
                                                 <a href="{% url 'main:update_education' education.id %}" class="button button-secondary button-sm">Edit</a>
-                                                {% include "components/education_delete_modal.html" with education=education %}
+                                                {% if user.is_superuser %}
+                                                    {% include "components/education_delete_modal.html" with education=education %}
+                                                {% endif %}
                                             </div>
                                         {% endif %}
                                     </div>
