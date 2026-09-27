@@ -9,10 +9,12 @@
                 <p class="section-kicker">My education history</p>
                 <div class="experience-header">
                     <h1>Education</h1>
-                    <a href="{% url 'main:create_education' %}" class="button experience-add-button">
-                        <span aria-hidden="true">+</span>
-                        Add Education
-                    </a>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_education' %}" class="button experience-add-button">
+                            <span aria-hidden="true">+</span>
+                            Add Education
+                        </a>
+                    {% endif %}
                 </div>
 
                 {% if education_list %}
@@ -39,10 +41,12 @@
                                             </span>
                                             <h3>{{ education.institution }}</h3>
                                         </div>
-                                        <div class="timeline-actions">
-                                            <a href="{% url 'main:update_education' education.id %}" class="button button-secondary button-sm">Edit</a>
-                                            {% include "components/education_delete_modal.html" with education=education %}
-                                        </div>
+                                        {% if user.is_superuser %}
+                                            <div class="timeline-actions">
+                                                <a href="{% url 'main:update_education' education.id %}" class="button button-secondary button-sm">Edit</a>
+                                                {% include "components/education_delete_modal.html" with education=education %}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endfor %}

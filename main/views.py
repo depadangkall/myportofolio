@@ -20,7 +20,7 @@ def is_valid_security_key(request):
 
 
 def show_main(request):
-    last_login = request.COOKIES.get("last_login", "Belum ada sesi login / Cookie tidak ditemukan")
+    last_login = request.COOKIES.get("last_login", "No login session yet / cookie not found")
     context = {
         "name": "Deva",
         "full_name": "I Gede Devadatta",
@@ -147,7 +147,11 @@ def get_education_json(request):
     return HttpResponse(educations_json, content_type="application/json")
 
 
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = EducationForm(request.POST or None)
 
     if request.method == "POST":
@@ -165,7 +169,11 @@ def create_education(request):
     return render(request, "education_form.html", context)
 
 
+@login_required(login_url="/login/")
 def update_education(request, education_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     education = get_object_or_404(Education, pk=education_id)
     form = EducationForm(request.POST or None, instance=education)
 
@@ -185,7 +193,11 @@ def update_education(request, education_id):
     return render(request, "education_form.html", context)
 
 
+@login_required(login_url="/login/")
 def delete_education(request, education_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     education = get_object_or_404(Education, pk=education_id)
 
     if request.method == "POST":
@@ -212,7 +224,7 @@ def register(request):
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, "Akun berhasil dibuat. Silakan login.")
+        messages.success(request, "Account created successfully. Please log in.")
         return redirect("main:login")
 
     context = {
