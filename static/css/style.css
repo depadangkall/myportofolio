@@ -1043,23 +1043,6 @@ h1, .brand {
     vertical-align: middle;
 }
 
-.inline-delete-form__key {
-    width: 9rem;
-    box-sizing: border-box;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    font: inherit;
-    font-size: 0.85rem;
-    background: #fff;
-    color: var(--ink);
-}
-
-.inline-delete-form__key:focus {
-    outline: 2px solid var(--accent);
-    border-color: var(--accent);
-}
-
 .experience-delete-modal {
     display: none;
     position: fixed;
@@ -1155,8 +1138,7 @@ h1, .brand {
         flex-direction: column-reverse;
     }
 
-    .experience-delete-modal__actions .button,
-    .experience-delete-modal__actions .inline-delete-form__key {
+    .experience-delete-modal__actions .button {
         width: 100%;
     }
 }
