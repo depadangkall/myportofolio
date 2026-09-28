@@ -19,7 +19,6 @@ load_dotenv()
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "i-gede57-myportofolio.pws.cs.ui.ac.id"]
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
-EDIT_SECRET_KEY = os.getenv('EDIT_SECRET_KEY', 'devadata123')
 
 CSRF_TRUSTED_ORIGINS = ["https://i-gede57-myportofolio.pws.cs.ui.ac.id"]
 
