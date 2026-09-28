@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
 
-from django.conf import settings
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -14,10 +13,6 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from main.forms import EducationForm, ExperienceForm
 from main.models import Education, Experience, Moment
-
-def is_valid_security_key(request):
-    return request.POST.get("security_key") == settings.EDIT_SECRET_KEY
-
 
 def show_main(request):
     last_login = request.COOKIES.get("last_login", "No login session yet / cookie not found")
@@ -68,13 +63,10 @@ def create_experience(request):
     
     form = ExperienceForm(request.POST or None)
 
-    if request.method == "POST":
-        if not is_valid_security_key(request):
-            messages.error(request, "Incorrect security key, experience was not added.")
-        elif form.is_valid():
-            form.save()
-            messages.success(request, "New experience added successfully!")
-            return redirect("main:show_experience")
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "New experience added successfully!")
+        return redirect("main:show_experience")
 
     context = {
         "name": "Deva",
@@ -91,13 +83,10 @@ def update_experience(request, experience_id):
 
     form = ExperienceForm(request.POST or None, instance=experience)
 
-    if request.method == "POST":
-        if not is_valid_security_key(request):
-            messages.error(request, "Incorrect security key, experience was not updated.")
-        elif form.is_valid():
-            form.save()
-            messages.success(request, "Experience updated successfully!")
-            return redirect("main:show_experience")
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Experience updated successfully!")
+        return redirect("main:show_experience")
 
     context = {
         "name": "Deva",
@@ -114,10 +103,6 @@ def delete_experience(request, experience_id):
     experience = get_object_or_404(Experience, pk=experience_id)
 
     if request.method == "POST":
-        if not is_valid_security_key(request):
-            messages.error(request, "Incorrect security key, experience was not deleted.")
-            return redirect("main:show_experience")
-
         experience.delete()
         messages.success(request, "Experience deleted successfully!")
         return redirect("main:show_experience")
@@ -154,13 +139,10 @@ def create_education(request):
 
     form = EducationForm(request.POST or None)
 
-    if request.method == "POST":
-        if not is_valid_security_key(request):
-            messages.error(request, "Incorrect security key, education was not added.")
-        elif form.is_valid():
-            form.save()
-            messages.success(request, "New education added successfully!")
-            return redirect("main:show_education")
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "New education added successfully!")
+        return redirect("main:show_education")
 
     context = {
         "name": "Deva",
@@ -177,13 +159,10 @@ def update_education(request, education_id):
     education = get_object_or_404(Education, pk=education_id)
     form = EducationForm(request.POST or None, instance=education)
 
-    if request.method == "POST":
-        if not is_valid_security_key(request):
-            messages.error(request, "Incorrect security key, education was not updated.")
-        elif form.is_valid():
-            form.save()
-            messages.success(request, "Education updated successfully!")
-            return redirect("main:show_education")
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Education updated successfully!")
+        return redirect("main:show_education")
 
     context = {
         "name": "Deva",
@@ -201,10 +180,6 @@ def delete_education(request, education_id):
     education = get_object_or_404(Education, pk=education_id)
 
     if request.method == "POST":
-        if not is_valid_security_key(request):
-            messages.error(request, "Incorrect security key, education was not deleted.")
-            return redirect("main:show_education")
-
         education.delete()
         messages.success(request, "Education deleted successfully!")
         return redirect("main:show_education")
