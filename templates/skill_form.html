@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block meta %}
+    <title>{% if skill %}Edit Skill{% else %}Add Skill{% endif %} - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
+    <main>
+        <section class="skills-section">
+            <div class="container">
+                <h1>{% if skill %}Edit Skill{% else %}Add New Skill{% endif %}</h1>
+                <form id="skill-page-form"
+                      method="post"
+                      action="{% if skill %}{% url 'main:update_skill' skill.id %}{% else %}{% url 'main:create_skill' %}{% endif %}"
+                      class="experience-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <p class="form-error">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="button">{% if skill %}Save Changes{% else %}Add Skill{% endif %}</button>
+                    <a href="{% url 'main:show_skills' %}" class="button button-secondary">Cancel</a>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    {% load static %}
+    <script src="{% static 'js/skill_form.js' %}"></script>
+    <script>
+        setupSkillLogoField(document.getElementById('skill-page-form'));
+    </script>
+{% endblock content %}
