@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm, NumberInput, Select, Textarea, TextInput
 from django.utils.html import strip_tags
 
-from main.models import Education, Experience
+from main.models import Education, Experience, Skill
 
 
 class ExperienceForm(ModelForm):
@@ -95,3 +95,69 @@ class EducationForm(ModelForm):
                 },
             ),
         }
+
+    def clean_institution(self):
+        institution = strip_tags(self.cleaned_data["institution"]).strip()
+        if not institution:
+            raise ValidationError("Institution name cannot contain only HTML tags.")
+        return institution
+
+
+class SkillForm(ModelForm):
+    class Meta:
+        model = Skill
+        fields = [
+            "name",
+            "category",
+            "level",
+            "logo",
+            "description",
+        ]
+
+        labels = {
+            "name": "Skill Name",
+            "category": "Category",
+            "level": "Level",
+            "logo": "Logo URL (optional, hard skills only)",
+            "description": "Description",
+        }
+
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "placeholder": "Django",
+                    "maxlength": 100,
+                },
+            ),
+            "category": Select(),
+            "level": Select(),
+            "logo": TextInput(
+                attrs={
+                    "placeholder": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                },
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Where and how you use this skill",
+                    "rows": 3,
+                },
+            ),
+        }
+
+    def clean_name(self):
+        name = strip_tags(self.cleaned_data["name"]).strip()
+        if not name:
+            raise ValidationError("Skill name cannot contain only HTML tags.")
+        return name
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
+
+    def clean_logo(self):
+        return strip_tags(self.cleaned_data["logo"]).strip()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get("category") == "soft":
+            cleaned_data["logo"] = ""
+        return cleaned_data
