@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+{% block meta %}
+    <title>Skills - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
+    <main>
+        <section class="skills-section" id="skills">
+            <div class="container">
+                <p class="section-kicker">What I bring to the table</p>
+                <div class="experience-header">
+                    <h1>Skills</h1>
+                    {% if user.is_superuser %}
+                        <button type="button"
+                                class="button experience-add-button"
+                                popovertarget="add-skill-modal">
+                            <span aria-hidden="true">+</span>
+                            Add Skill
+                        </button>
+                    {% endif %}
+                </div>
+
+                <div class="skills-toolbar">
+                    <form id="skill-search-form" class="experience-search skills-search">
+                        <input type="search"
+                               id="search-input"
+                               name="name"
+                               value="{{ name_query }}"
+                               placeholder="Search by skill name"
+                               class="experience-search__input"
+                               aria-label="Search by skill name">
+                        <button type="submit" class="button">Search</button>
+                    </form>
+
+                    <div class="skills-filter" role="group" aria-label="Filter skills by category">
+                        <button type="button" class="skills-filter__button is-active" data-filter="all" aria-pressed="true">All</button>
+                        <button type="button" class="skills-filter__button" data-filter="hard" aria-pressed="false">Hard</button>
+                        <button type="button" class="skills-filter__button" data-filter="soft" aria-pressed="false">Soft</button>
+                    </div>
+                </div>
+
+                <div id="loading" class="empty-state hide">
+                    <p>Loading skills...</p>
+                </div>
+
+                <div id="error" class="empty-state hide">
+                    <p>Failed to load skills. Please try again.</p>
+                </div>
+
+                <div id="empty" class="empty-state hide">
+                    <p>No skill has been added or found yet.</p>
+                </div>
+
+                <div id="skills-board" class="skills-board hide">
+                    <section class="skill-group skill-group--hard" data-category="hard">
+                        <div class="skill-group__header">
+                            <h2>Hard Skills</h2>
+                            <span id="hard-count" class="skill-group__count">0</span>
+                        </div>
+                        <div id="hard-list" class="skill-list"></div>
+                    </section>
+
+                    <section class="skill-group skill-group--soft" data-category="soft">
+                        <div class="skill-group__header">
+                            <h2>Soft Skills</h2>
+                            <span id="soft-count" class="skill-group__count">0</span>
+                        </div>
+                        <div id="soft-list" class="skill-list"></div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% if user.is_superuser %}
+        {% include "components/skill_form_modal.html" %}
+    {% endif %}
+
+    {% load static %}
+    <script src="{% static 'js/skill_form.js' %}"></script>
+    <script>
+        const BASE_SKILLS_ENDPOINT = "{% url 'main:get_skills_json' %}";
+        const CREATE_SKILL_ENDPOINT = "{% url 'main:create_skill_ajax' %}";
+        const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+        const CAN_EDIT = "{{ perms.main.change_skill|yesno:'true,false' }}" === "true";
+        const DUMMY_ID = "999999999";
+        const MAX_LEVEL = 4;
+        let skillsAbortController;
+        let activeFilter = 'all';
+
+        const loadingState = document.getElementById('loading');
+        const errorState = document.getElementById('error');
+        const emptyState = document.getElementById('empty');
+        const skillsBoard = document.getElementById('skills-board');
+        const searchForm = document.getElementById('skill-search-form');
+        const searchInput = document.getElementById('search-input');
+        const skillForm = document.getElementById('skill-form');
+        const filterButtons = document.querySelectorAll('.skills-filter__button');
+        const skillGroups = {
+            hard: {
+                list: document.getElementById('hard-list'),
+                count: document.getElementById('hard-count'),
+                emptyText: 'No hard skill yet.',
+            },
+            soft: {
+                list: document.getElementById('soft-list'),
+                count: document.getElementById('soft-count'),
+                emptyText: 'No soft skill yet.',
+            },
+        };
+
+        const SEARCH_DEBOUNCE_DELAY = 300;
+        let searchDebounceTimer;
+
+        function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showBoard = false }) {
+            loadingState.classList.toggle('hide', !showLoading);
+            errorState.classList.toggle('hide', !showError);
+            emptyState.classList.toggle('hide', !showEmpty);
+            skillsBoard.classList.toggle('hide', !showBoard);
+        }
+
+        function buildLevelHtml(level, levelDisplay) {
+            let segments = '';
+            for (let i = 1; i <= MAX_LEVEL; i++) {
+                segments += `<span class="skill-level__segment${i <= level ? ' is-filled' : ''}"></span>`;
+            }
+            return `
+                <div class="skill-level" role="img" aria-label="Level ${escapeHtml(levelDisplay)}">
+                    <div class="skill-level__bar">${segments}</div>
+                    <span class="skill-level__label">${escapeHtml(levelDisplay)}</span>
+                </div>
+            `;
+        }
+
+        function buildSkillCardElement(item, index) {
+            const skill = item.fields;
+            const skillId = String(item.pk);
+
+            const cardElement = document.createElement('article');
+            cardElement.className = 'skill-card';
+            cardElement.style.animationDelay = `${index * 0.06}s`;
+
+            const logoHtml = skill.logo
+                ? `<img src="${escapeHtml(skill.logo)}" alt="" class="skill-card__logo" loading="lazy" onerror="this.remove()">`
+                : '';
+
+            const descriptionHtml = skill.description
+                ? `<p class="skill-card__description">${escapeHtml(skill.description)}</p>`
+                : '';
+
+            const editUrl = "{% url 'main:update_skill' 999999999 %}".replace(DUMMY_ID, skillId);
+            const deleteUrl = "{% url 'main:delete_skill' 999999999 %}".replace(DUMMY_ID, skillId);
+            const starUrl = "{% url 'main:toggle_skill_star' 999999999 %}".replace(DUMMY_ID, skillId);
+
+            const editHtml = CAN_EDIT
+                ? `<a href="${editUrl}" class="button button-secondary button-sm">Edit</a>`
+                : '';
+
+            const deleteHtml = IS_SUPERUSER
+                ? `<form method="post" action="${deleteUrl}" class="star-form">
+                       {% csrf_token %}
+                       <button type="submit" class="button button-danger button-sm" onclick="return confirm('Are you sure you want to delete this skill?');">Delete</button>
+                   </form>`
+                : '';
+
+            const isStarredClass = skill.is_starred ? " is-starred" : "";
+            const starText = skill.is_starred ? "Unstar" : "Star";
+            const starTitle = skill.star_count > 0
+                ? `Starred by ${escapeHtml(skill.starred_by_names)}`
+                : "Be the first to give a star";
+
+            cardElement.innerHTML = `
+                <div class="skill-card__top">
+                    <div class="skill-card__title">
+                        ${logoHtml}
+                        <h3>${escapeHtml(skill.name)}</h3>
+                    </div>
+                    ${buildLevelHtml(skill.level, skill.level_display)}
+                </div>
+                ${descriptionHtml}
+                <div class="skill-card__actions">
+                    <form method="post" action="${starUrl}" class="star-form">
+                        {% csrf_token %}
+                        <button type="submit" class="button button-star button-sm${isStarredClass}" title="${starTitle}">
+                            <span aria-hidden="true">★</span>
+                            ${starText}
+                            <span class="star-count">${skill.star_count}</span>
+                        </button>
+                    </form>
+                    ${editHtml}
+                    ${deleteHtml}
+                </div>
+            `;
+
+            return cardElement;
+        }
+
+        function renderSkills(skillData) {
+            Object.entries(skillGroups).forEach(([category, group]) => {
+                const items = skillData.filter(item => item.fields.category === category);
+                group.list.innerHTML = '';
+                group.count.textContent = items.length;
+
+                if (items.length === 0) {
+                    const emptyText = document.createElement('p');
+                    emptyText.className = 'empty-state skill-list__empty';
+                    emptyText.textContent = group.emptyText;
+                    group.list.appendChild(emptyText);
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    group.list.appendChild(buildSkillCardElement(item, index));
+                });
+            });
+        }
+
+        function applyFilter() {
+            document.querySelectorAll('.skill-group').forEach(group => {
+                group.classList.toggle('hide', activeFilter !== 'all' && group.dataset.category !== activeFilter);
+            });
+            skillsBoard.classList.toggle('is-single', activeFilter !== 'all');
+            filterButtons.forEach(button => {
+                const isActive = button.dataset.filter === activeFilter;
+                button.classList.toggle('is-active', isActive);
+                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        }
+
+        async function fetchSkills(searchQuery = "") {
+            if (skillsAbortController) skillsAbortController.abort();
+            skillsAbortController = new AbortController();
+
+            try {
+                displayPageSection({ showLoading: true });
+
+                const url = searchQuery ? `${BASE_SKILLS_ENDPOINT}?name=${encodeURIComponent(searchQuery)}` : BASE_SKILLS_ENDPOINT;
+
+                const response = await fetch(url, {
+                    headers: { 'Accept': 'application/json' },
+                    signal: skillsAbortController.signal,
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch data');
+
+                const skillData = await response.json();
+
+                if (skillData.length === 0) {
+                    displayPageSection({ showEmpty: true });
+                } else {
+                    renderSkills(skillData);
+                    applyFilter();
+                    displayPageSection({ showBoard: true });
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error('Error loading skills:', error);
+                displayPageSection({ showError: true });
+            }
+        }
+
+        function searchSkills() {
+            fetchSkills(searchInput.value.trim());
+        }
+
+        searchInput.addEventListener("input", function () {
+            clearTimeout(searchDebounceTimer);
+
+            searchDebounceTimer = setTimeout(function () {
+                searchSkills();
+            }, SEARCH_DEBOUNCE_DELAY);
+        });
+
+        searchForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            clearTimeout(searchDebounceTimer);
+            searchSkills();
+        });
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                activeFilter = button.dataset.filter;
+                applyFilter();
+            });
+        });
+
+        function closeSkillModal() {
+            document.getElementById("add-skill-modal").hidePopover();
+        }
+
+        async function addSkill(event) {
+            event.preventDefault();
+
+            const submitButton = skillForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch(CREATE_SKILL_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    body: new FormData(skillForm),
+                });
+                const result = await response.json().catch(() => ({}));
+
+                if (response.ok) {
+                    skillForm.reset();
+                    closeSkillModal();
+                    showToast('Success', 'New skill added successfully!', 'success');
+                    fetchSkills(searchInput.value.trim());
+                } else {
+                    const errorMessages = result.errors
+                        ? Object.values(result.errors).flat().map(error => error.message)
+                        : [result.message || `Something went wrong (status ${response.status}).`];
+                    showToast('Failed to add skill', errorMessages.join(' '), 'error');
+                }
+            } catch (error) {
+                console.error('Error adding skill:', error);
+                showToast('Failed to add skill', 'Could not connect to the server. Please try again.', 'error');
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        if (skillForm) {
+            skillForm.addEventListener('submit', addSkill);
+            setupSkillLogoField(skillForm);
+        }
+
+        fetchSkills(searchInput.value.trim());
+    </script>
+{% endblock content %}

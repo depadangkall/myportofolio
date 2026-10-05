@@ -4,16 +4,15 @@ from django.core.exceptions import PermissionDenied
 
 
 from django.contrib import messages
-from django.core import serializers
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
-from main.forms import EducationForm, ExperienceForm
-from main.models import Education, Experience, Moment
+from main.forms import EducationForm, ExperienceForm, SkillForm
+from main.models import Education, Experience, Moment, Skill
 
 def show_main(request):
     last_login = request.COOKIES.get("last_login", "No login session yet / cookie not found")
@@ -143,25 +142,37 @@ def delete_experience(request, experience_id):
 
 
 def show_education(request):
-    json_response = get_education_json(request)
-    educations = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    education_list = [education.object for education in educations]
-    education_list.sort(key=lambda education: education.start_year)
+    institution_query = request.GET.get("institution", "").strip()
 
     context = {
         "name": "Deva",
-        "education_list": education_list,
+        "institution_query": institution_query,
+        "form": EducationForm(),
     }
     return render(request, "education.html", context)
 
 
 def get_education_json(request):
-    educations = Education.objects.all()
-    educations_json = serializers.serialize("json", educations)
-    return HttpResponse(educations_json, content_type="application/json")
+    institution_query = request.GET.get("institution", "").strip()
+    educations = Education.objects.order_by("start_year")
+
+    if institution_query:
+        educations = educations.filter(institution__icontains=institution_query)
+
+    data = []
+    for education in educations:
+        data.append({
+            "pk": education.id,
+            "fields": {
+                "institution": education.institution,
+                "thumbnail": education.thumbnail,
+                "start_year": education.start_year,
+                "end_year": education.end_year,
+                "is_ongoing": education.is_ongoing,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 
 @login_required(login_url="/login/")
@@ -181,6 +192,25 @@ def create_education(request):
         "form": form,
     }
     return render(request, "education_form.html", context)
+
+
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add education."},
+            status=403,
+        )
+
+    form = EducationForm(request.POST)
+    if form.is_valid():
+        education = form.save()
+        return JsonResponse(
+            {"message": "Education added successfully.", "pk": education.id},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
 @login_required(login_url="/login/")
@@ -217,6 +247,135 @@ def delete_education(request, education_id):
         return redirect("main:show_education")
 
     return redirect("main:show_education")
+
+
+def show_skills(request):
+    name_query = request.GET.get("name", "").strip()
+
+    context = {
+        "name": "Deva",
+        "name_query": name_query,
+        "form": SkillForm(),
+    }
+    return render(request, "skills.html", context)
+
+
+def get_skills_json(request):
+    name_query = request.GET.get("name", "").strip()
+    skills = Skill.objects.prefetch_related("starred_by").order_by("category", "-level", "name")
+
+    if name_query:
+        skills = skills.filter(name__icontains=name_query)
+
+    data = []
+    for skill in skills:
+        starred_users = skill.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": skill.id,
+            "fields": {
+                "name": skill.name,
+                "category": skill.category,
+                "category_display": skill.get_category_display(),
+                "level": skill.level,
+                "level_display": skill.get_level_display(),
+                "logo": skill.logo,
+                "description": skill.description,
+                "star_count": len(starred_users),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+@login_required(login_url="/login/")
+def create_skill(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    form = SkillForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "New skill added successfully!")
+        return redirect("main:show_skills")
+
+    context = {
+        "name": "Deva",
+        "form": form,
+    }
+    return render(request, "skill_form.html", context)
+
+
+@require_POST
+def create_skill_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add skills."},
+            status=403,
+        )
+
+    form = SkillForm(request.POST)
+    if form.is_valid():
+        skill = form.save()
+        return JsonResponse(
+            {"message": "Skill added successfully.", "pk": skill.id},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+
+@login_required(login_url="/login/")
+def update_skill(request, skill_id):
+    if not request.user.has_perm("main.change_skill"):
+        raise PermissionDenied
+
+    skill = get_object_or_404(Skill, pk=skill_id)
+    form = SkillForm(request.POST or None, instance=skill)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Skill updated successfully!")
+        return redirect("main:show_skills")
+
+    context = {
+        "name": "Deva",
+        "form": form,
+        "skill": skill,
+    }
+    return render(request, "skill_form.html", context)
+
+
+@login_required(login_url="/login/")
+def delete_skill(request, skill_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    skill = get_object_or_404(Skill, pk=skill_id)
+
+    if request.method == "POST":
+        skill.delete()
+        messages.success(request, "Skill deleted successfully!")
+
+    return redirect("main:show_skills")
+
+
+@login_required(login_url="/login/")
+def toggle_skill_star(request, skill_id):
+    skill = get_object_or_404(Skill, pk=skill_id)
+
+    if request.method == "POST":
+        if request.user in skill.starred_by.all():
+            skill.starred_by.remove(request.user)
+        else:
+            skill.starred_by.add(request.user)
+
+    return redirect("main:show_skills")
 
 
 def show_moments(request):

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Education, Experience, Moment
+from main.models import Education, Experience, Moment, Skill
 
 
 class MainTest(TestCase):
@@ -76,26 +76,50 @@ class MainTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "education.html")
 
-    def test_education_page(self):
-        response = self.client.get(reverse("main:show_education"))
+    def test_education_json(self):
+        response = self.client.get(reverse("main:get_education_json"))
+        fields = response.json()[0]["fields"]
 
-        self.assertContains(response, self.education.institution)
-        self.assertContains(response, "Present")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(fields["institution"], self.education.institution)
+        self.assertTrue(fields["is_ongoing"])
 
-    def test_empty_education_page(self):
+    def test_empty_education_json(self):
         Education.objects.all().delete()
-        response = self.client.get(reverse("main:show_education"))
+        response = self.client.get(reverse("main:get_education_json"))
 
-        self.assertContains(response, "No education history has been added yet.")
+        self.assertEqual(response.json(), [])
 
     def test_completed_education(self):
         self.education.end_year = 2029
         self.education.save()
-        response = self.client.get(reverse("main:show_education"))
+        response = self.client.get(reverse("main:get_education_json"))
+        fields = response.json()[0]["fields"]
 
         self.assertFalse(self.education.is_ongoing)
-        self.assertContains(response, "2029")
-        self.assertNotContains(response, "Present")
+        self.assertFalse(fields["is_ongoing"])
+        self.assertEqual(fields["end_year"], 2029)
+
+    def test_skills_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_skills"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "skills.html")
+
+    def test_skills_json(self):
+        Skill.objects.create(name="Django", category="hard", level=3)
+        Skill.objects.create(name="Public Speaking", category="soft", level=2)
+        response = self.client.get(reverse("main:get_skills_json"))
+        names = [item["fields"]["name"] for item in response.json()]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(names, ["Django", "Public Speaking"])
+        self.assertEqual(response.json()[0]["fields"]["star_count"], 0)
+
+    def test_empty_skills_json(self):
+        response = self.client.get(reverse("main:get_skills_json"))
+
+        self.assertEqual(response.json(), [])
 
     def test_moments_url_is_accessible(self):
         response = self.client.get(reverse("main:show_moments"))
